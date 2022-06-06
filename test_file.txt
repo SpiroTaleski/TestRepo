@@ -1,1 +1,1 @@
-test file created from SnapLogic/ updated from SL
+test file created from SnapLogic/updated
