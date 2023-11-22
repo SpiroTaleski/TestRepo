@@ -1,0 +1,80 @@
+{
+	"name": "pl_Task03_JoinEmployeeRecords",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_Task3_JoinEmployeeRecords",
+						"type": "DataFlowReference",
+						"parameters": {
+							"targetFilename": "'Task3.csv'"
+						},
+						"datasetParameters": {
+							"source1": {
+								"filename": {
+									"value": "@pipeline().parameters.fileInput1",
+									"type": "Expression"
+								},
+								"task": {
+									"value": "@pipeline().parameters.Task",
+									"type": "Expression"
+								}
+							},
+							"source2": {
+								"filename": {
+									"value": "@pipeline().parameters.fileInput2",
+									"type": "Expression"
+								},
+								"task": {
+									"value": "@pipeline().parameters.Task",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"fileInput2": {
+				"type": "string",
+				"defaultValue": "CAIncomeByZip.csv"
+			},
+			"fileInput1": {
+				"type": "string",
+				"defaultValue": "Leads.csv"
+			},
+			"Task": {
+				"type": "string",
+				"defaultValue": "Task3"
+			},
+			"targetFile": {
+				"type": "string",
+				"defaultValue": "Task3.csv"
+			}
+		},
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-17T17:55:23Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

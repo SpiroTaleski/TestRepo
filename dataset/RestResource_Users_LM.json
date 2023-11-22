@@ -1,0 +1,16 @@
+{
+	"name": "RestResource_Users_LM",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService_Users_LM",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

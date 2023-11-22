@@ -1,0 +1,98 @@
+{
+	"name": "df_Task3_JoinEmployeeRecords",
+	"properties": {
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     targetFilename as string ('Task3.csv')",
+				"}",
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2",
+				"filter1, source2 join(source1@Zip == source2@Zip,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"source1 filter(City=='San Francisco') ~> filter1",
+				"join1 sort(asc(source1@Zip, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     partitionFileNames:[($targetFilename)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

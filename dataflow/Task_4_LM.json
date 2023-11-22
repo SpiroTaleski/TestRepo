@@ -1,0 +1,98 @@
+{
+	"name": "Task_4_LM",
+	"properties": {
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "RestResource_Users_LM",
+						"type": "DatasetReference"
+					},
+					"name": "Get100Users"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "TargetTask4Output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten"
+				},
+				{
+					"name": "MappColumns"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "filter40old"
+				},
+				{
+					"name": "MapFriday"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          body as (info as (page as boolean, results as short, seed as string, version as double), results as (cell as string, dob as (age as short, date as string), email as string, gender as string, id as (name as string, value as string), location as (city as string, coordinates as (latitude as double, longitude as double), country as string, postcode as string, state as string, street as (name as string, number as short), timezone as (description as string, offset as string)), login as (md5 as string, password as string, salt as string, sha1 as string, sha256 as string, username as string, uuid as string), name as (first as string, last as string, title as string), nat as string, phone as string, picture as (large as string, medium as string, thumbnail as string), registered as (age as short, date as string))[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     httpMethod: 'GET',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     queryParameters: ['results' -> '100'],",
+				"     paginationRules: ['supportRFC5988' -> 'true'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> Get100Users",
+				"Get100Users foldDown(unroll(body.results, body.results),",
+				"     mapColumn(",
+				"          first = body.results.name.first,",
+				"          last = body.results.name.last,",
+				"          city = body.results.location.city,",
+				"          country = body.results.location.country,",
+				"          dob = body.results.dob.date,",
+				"          age = body.results.dob.age",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten",
+				"flatten derive({Full Name} = concat(first,' ', last),",
+				"          City = city,",
+				"          Country = country,",
+				"          DOB = concat(substring(dob, 9, 2),'-',substring(dob, 6, 2),'-',substring(dob, 1, 4)),",
+				"          Age = age,",
+				"          {Day Of Week} = dayOfWeek(toDate(dob)),",
+				"     partitionBy('hash', 1)) ~> MappColumns",
+				"MappColumns select(mapColumn(",
+				"          {Full Name},",
+				"          City = MappColumns@City,",
+				"          Country = MappColumns@Country,",
+				"          DOB = MappColumns@DOB,",
+				"          Age = MappColumns@Age,",
+				"          {Day Of Week}",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 filter(Age >=40 && {Day Of Week}==6) ~> filter40old",
+				"filter40old derive({Day Of Week} = 'Friday') ~> MapFriday",
+				"MapFriday sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Born_on_Friday.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

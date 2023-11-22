@@ -1,0 +1,119 @@
+{
+	"name": "Task_4_Born_On_Friday",
+	"properties": {
+		"activities": [
+			{
+				"name": "ProcessBornOnFriday",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_4_Born_On_Friday",
+						"type": "DataFlowReference",
+						"parameters": {
+							"target_file": "\"Born_on_Friday.csv\""
+						},
+						"datasetParameters": {
+							"sink1": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven_Target.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"staging_filename": {
+				"type": "string",
+				"defaultValue": "task_4_store_web_service_details.json"
+			},
+			"target_filename": {
+				"type": "string",
+				"defaultValue": "Born_on_Friday.csv"
+			}
+		},
+		"variables": {
+			"arr": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"gender": "female",
+						"name": {
+							"title": "Mrs",
+							"first": "Gloria",
+							"last": "Taks"
+						},
+						"location": {
+							"street": {
+								"number": 7057,
+								"name": "Baumgartenstraat"
+							},
+							"city": "Gortel",
+							"state": "Zuid-Holland",
+							"country": "Netherlands",
+							"postcode": "0251 VB",
+							"coordinates": {
+								"latitude": "37.9002",
+								"longitude": "68.4527"
+							},
+							"timezone": {
+								"offset": "-10:00",
+								"description": "Hawaii"
+							}
+						},
+						"email": "gloria.taks@example.com",
+						"login": {
+							"uuid": "5aa1b14f-fdaf-451e-aad1-b945521aebac",
+							"username": "bigpanda622",
+							"password": "stories",
+							"salt": "2O7uf6PP",
+							"md5": "36c12e0a963664dfacb9a52ad486a382",
+							"sha1": "374431610874ff1958b978bcf33c71f5cf016a4b",
+							"sha256": "b1a2d9896f89c1eccdb0959cf7eb100ff9023072d8cd3167c399c72cc86f0d7e"
+						},
+						"dob": {
+							"date": "1960-03-13T16:04:57.593Z",
+							"age": 63
+						},
+						"registered": {
+							"date": "2009-07-14T14:19:36.293Z",
+							"age": 14
+						},
+						"phone": "(011) 6976740",
+						"cell": "(06) 55670823",
+						"id": {
+							"name": "BSN",
+							"value": "74139055"
+						},
+						"picture": {
+							"large": "https://randomuser.me/api/portraits/women/34.jpg",
+							"medium": "https://randomuser.me/api/portraits/med/women/34.jpg",
+							"thumbnail": "https://randomuser.me/api/portraits/thumb/women/34.jpg"
+						},
+						"nat": "NL"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-15T10:55:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

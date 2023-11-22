@@ -1,0 +1,88 @@
+{
+	"name": "OneInputMultipleOutputs",
+	"properties": {
+		"folder": {
+			"name": "Viktorija Stojanova"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS_csv",
+						"type": "DatasetReference"
+					},
+					"name": "Input"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "TrngFilterEven"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Below15"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Above15"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddColumn"
+				},
+				{
+					"name": "IncreaseNumber"
+				},
+				{
+					"name": "FilterAbove15"
+				},
+				{
+					"name": "FilterBelow15"
+				},
+				{
+					"name": "FilterEvenIndex"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Input",
+				"Input derive(Number = 1) ~> AddColumn",
+				"AddColumn window(Number = rowNumber()) ~> IncreaseNumber",
+				"IncreaseNumber filter(toInteger('Employee ID') > 15) ~> FilterAbove15",
+				"IncreaseNumber filter(toInteger('Employee ID') < 15) ~> FilterBelow15",
+				"IncreaseNumber filter(Number % 2 == 0) ~> FilterEvenIndex",
+				"FilterEvenIndex sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['TrngFilterEven.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> TrngFilterEven",
+				"FilterBelow15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Trng_IDbelow15.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Below15",
+				"FilterAbove15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Trng_IDabove15.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Above15"
+			]
+		}
+	}
+}

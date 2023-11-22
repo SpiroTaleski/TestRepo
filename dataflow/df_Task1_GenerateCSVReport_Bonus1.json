@@ -1,0 +1,91 @@
+{
+	"name": "df_Task1_GenerateCSVReport_Bonus1",
+	"properties": {
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     filenameDF as string ('CA_Birthdays_Bonus1.csv')",
+				"}",
+				"source(output(",
+				"          ID as string,",
+				"          BIRTHDAY as string,",
+				"          CCEXPIRES as string,",
+				"          CCNUMBER as string,",
+				"          CCTYPE as string,",
+				"          CVV2 as string,",
+				"          CITY as string,",
+				"          COUNTRY as string,",
+				"          EMAILADDRESS as string,",
+				"          GENDER as string,",
+				"          GIVENNAME as string,",
+				"          MIDDLEINITIAL as string,",
+				"          MOTHERSMAIDEN as string,",
+				"          SSN as string,",
+				"          STATECODE as string,",
+				"          STREETADDRESS as string,",
+				"          SURNAME as string,",
+				"          TELEPHONENUMBER as string,",
+				"          UPS as string,",
+				"          ZIPCODE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 filter(STATECODE=='CA'&&between(BIRTHDAY, '1963-01-01', '1965-31-12')) ~> filter1",
+				"select1 sort(desc(SURNAME, true),",
+				"     partitionBy('hash', 1)) ~> sort1",
+				"filter1 select(mapColumn(",
+				"          SURNAME,",
+				"          GIVENNAME,",
+				"          BIRTHDAY",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     partitionFileNames:[($filenameDF)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

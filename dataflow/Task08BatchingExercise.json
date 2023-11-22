@@ -1,0 +1,53 @@
+{
+	"name": "Task08BatchingExercise",
+	"properties": {
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Excel",
+						"type": "DatasetReference"
+					},
+					"name": "Task08"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "JSON",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Group as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Task08",
+				"Task08 aggregate(groupBy(Group),",
+				"     group = collect(@(First=First, Last=Last, Address=Address, City=City, State=State))) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

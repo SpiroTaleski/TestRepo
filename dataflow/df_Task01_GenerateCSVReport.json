@@ -1,0 +1,70 @@
+{
+	"name": "df_Task01_GenerateCSVReport",
+	"properties": {
+		"folder": {
+			"name": "Ivica Koteski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Task01UnzipedFile_IK",
+						"type": "DatasetReference"
+					},
+					"name": "CaliforniaBirthdays"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Task01Output_IK",
+						"type": "DatasetReference"
+					},
+					"name": "WriteReponse"
+				}
+			],
+			"transformations": [
+				{
+					"name": "MapReuqiedFields",
+					"description": "Creates an explicit mapping for each drifted column"
+				},
+				{
+					"name": "SortByFirstName"
+				},
+				{
+					"name": "FilterByBirthYear"
+				},
+				{
+					"name": "GetFieldsAndGetEmailDomain"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CaliforniaBirthdays",
+				"CaliforniaBirthdays derive(GIVENNAME = toString(byName('GIVENNAME')),",
+				"          SURNAME = toString(byName('SURNAME')),",
+				"          BIRTHDAY = toString(byName('BIRTHDAY')),",
+				"          DOMAIN = (substring(toString(byName('EMAILADDRESS')),instr(toString(byName('EMAILADDRESS')),'@')))) ~> MapReuqiedFields",
+				"FilterByBirthYear sort(asc(FirstName, true)) ~> SortByFirstName",
+				"GetFieldsAndGetEmailDomain filter(year(toDate(BirthDay)) == 1963 ||",
+				"year(toDate(BirthDay)) == 1964 ||",
+				"year(toDate(BirthDay)) == 1965) ~> FilterByBirthYear",
+				"MapReuqiedFields select(mapColumn(",
+				"          FirstName = GIVENNAME,",
+				"          LastName = SURNAME,",
+				"          BirthDay = BIRTHDAY,",
+				"          Domain = DOMAIN",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> GetFieldsAndGetEmailDomain",
+				"SortByFirstName sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteReponse"
+			]
+		}
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"name": "ADF-IWConnect-R1",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "c8e50d46-37a3-4148-939e-0411be2a521b",
+		"tenantId": "93004b47-238e-4ef7-b9f7-8085640be5b8"
+	}
+}

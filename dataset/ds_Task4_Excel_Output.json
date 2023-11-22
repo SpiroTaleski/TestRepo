@@ -1,0 +1,60 @@
+{
+	"name": "ds_Task4_Excel_Output",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_EN",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"filename": {
+				"type": "string",
+				"defaultValue": "Born_on_Friday.xlsx"
+			},
+			"Task": {
+				"type": "string",
+				"defaultValue": "Task4"
+			}
+		},
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Sheet1",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().filename",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().Task",
+					"type": "Expression"
+				},
+				"container": "emilijanedanovska"
+			}
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

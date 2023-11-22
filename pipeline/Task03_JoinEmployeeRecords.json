@@ -1,0 +1,59 @@
+{
+	"name": "Task03_JoinEmployeeRecords",
+	"properties": {
+		"activities": [
+			{
+				"name": "Join employee records",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task03JoinEmployeeRecords",
+						"type": "DataFlowReference",
+						"parameters": {
+							"fileName": "\"Task03.csv\"",
+							"fileNameBonus": "\"Task03Bonus2.csv\""
+						},
+						"datasetParameters": {
+							"Leads": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Leads.csv"
+							},
+							"CAIncomeByZip": {
+								"containerName": "gjorgeargirov",
+								"fileName": "CAIncomeByZip.csv"
+							},
+							"Task3": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Task03.csv"
+							},
+							"Bonus2": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Bonus02.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-17T09:11:28Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

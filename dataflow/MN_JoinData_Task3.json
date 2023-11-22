@@ -1,0 +1,100 @@
+{
+	"name": "MN_JoinData_Task3",
+	"properties": {
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MN_Leads_Task3",
+						"type": "DatasetReference"
+					},
+					"name": "LeadsData"
+				},
+				{
+					"dataset": {
+						"referenceName": "MN_ZipCodes_Task3",
+						"type": "DatasetReference"
+					},
+					"name": "ZipCodesData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "JoinedLeadsData",
+						"type": "DatasetReference"
+					},
+					"name": "JoinedData"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinData"
+				},
+				{
+					"name": "LeadsSanFrancisco"
+				},
+				{
+					"name": "sortZipDesc"
+				},
+				{
+					"name": "newColumnMoreThan10KBoolean"
+				},
+				{
+					"name": "MapOnlyNewColumnTrue"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> LeadsData",
+				"source(output(",
+				"          Zip as string,",
+				"          LessThan10K as string,",
+				"          MoreThan10K as string,",
+				"          MoreThan25K as string,",
+				"          {MoreThan50K } as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ZipCodesData",
+				"LeadsSanFrancisco, ZipCodesData join(LeadsData@Zip == ZipCodesData@Zip,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinData",
+				"LeadsData filter(City=='San Francisco') ~> LeadsSanFrancisco",
+				"JoinData sort(desc(LeadsData@Zip, true)) ~> sortZipDesc",
+				"sortZipDesc derive({MoreThan10K-Boolean} = iif(toLong(byName('MoreThan10K')) > 0.43, true(), false())) ~> newColumnMoreThan10KBoolean",
+				"newColumnMoreThan10KBoolean derive({MoreThan10K-Boolean} = toBoolean(byName('MoreThan10K-Boolean')) == true()) ~> MapOnlyNewColumnTrue",
+				"MapOnlyNewColumnTrue sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          SURNAME as string,",
+				"          GIVENNAME as string,",
+				"          BIRTHDAY as string",
+				"     ),",
+				"     partitionFileNames:['Task3.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> JoinedData"
+			]
+		}
+	}
+}

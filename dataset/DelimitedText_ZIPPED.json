@@ -1,0 +1,41 @@
+{
+	"name": "DelimitedText_ZIPPED",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LM",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Task1.zip",
+				"container": "ljupchomachkovski"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "ZipDeflate",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000 mkG\t/�*|M=\u00009\u0019�\u0000\f\u0000\u0000\u0000testdata.csv��[[�ܒ-|߿B����t�'ݵ\u0001\u0013�pژ7t�N\u0001\u0005�����N\u0016���1��\u000eƘ��y\u0003A�*�9�F�F��O��L�>�ܞ�L������_������.��7�����)�����_�o��.oo���b��|rr���~�^��/~��mzy9���^|>99�~��|�yr��nϦ73����\u0012��f��������d*_�L���mg���{�Nϧ�gW���\u0011���\u0015���Z~�?�\u001c��+Gy>�J|S�E��\u000b[\u0014>\u000bye�\f_\u0014\u0015\u001f�~�4��z��\u000bˌ�����_]�޼���eތg�٦��",
+				"type": "String"
+			},
+			{
+				"name": "_�k��_�^���b|�z�\u0005?��zѴW�\u0016�s���/MiFƏ���q�\u0013��0�'������~J����ޜO��Q0n�m�_��'�Y�\u0004�\u0012k���6q!K\u001c~���\u0017��\u0010��\u0019e�(3�&oE6>�����[\u001fJ��6��\u0014\u0015>���ɼy\\��~Y-��/��f�_�W�_��ɋ�\u0017_�}��Ό\u001c�f�<����D\u001e#���j��",
+				"type": "String"
+			},
+			{
+				"name": "��f�4\u001b���Y��FE�P\u0015���_M��J|�\u0014\u000e\"W�Ox/\\�[�Y�������2\u0007J�_�e��!����ې�Y��)�t�̚���\u0013�|���l6�x:��/\u0016����(�|YoV�R�W�V�s���o(��b�#�G�$��Kf��e��%o?\"�\u001ag#犑�l��㹓�N��%\\x.t¥�V5\u0014ި�\bO\u0001\u000b",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

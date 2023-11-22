@@ -1,0 +1,119 @@
+{
+	"name": "DF_GenerateFiles_BG",
+	"properties": {
+		"folder": {
+			"name": "Borko Golomeov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_UnzippedFile_BG",
+						"type": "DatasetReference"
+					},
+					"name": "ReadUnzippedFile"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_CAResidents_BG",
+						"type": "DatasetReference"
+					},
+					"name": "WriteCAResidents"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_CAResidentsByYear_BG",
+						"type": "DatasetReference"
+					},
+					"name": "WriteCAResidentsByYear"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_EditMail_BG",
+						"type": "DatasetReference"
+					},
+					"name": "WriteDomainFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterCAResidents"
+				},
+				{
+					"name": "MapColumns"
+				},
+				{
+					"name": "SortByLastNameDesc"
+				},
+				{
+					"name": "FilterCAResidentsByYear"
+				},
+				{
+					"name": "SplitEmailAddress"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ID as short,",
+				"          BIRTHDAY as date,",
+				"          CCEXPIRES as string,",
+				"          CCNUMBER as long,",
+				"          CCTYPE as string,",
+				"          CVV2 as short,",
+				"          CITY as string,",
+				"          COUNTRY as string,",
+				"          EMAILADDRESS as string,",
+				"          GENDER as string,",
+				"          GIVENNAME as string,",
+				"          MIDDLEINITIAL as string,",
+				"          MOTHERSMAIDEN as string,",
+				"          SSN as string,",
+				"          STATECODE as string,",
+				"          STREETADDRESS as string,",
+				"          SURNAME as string,",
+				"          TELEPHONENUMBER as string,",
+				"          UPS as string,",
+				"          ZIPCODE as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadUnzippedFile",
+				"ReadUnzippedFile filter(STATECODE == \"CA\") ~> FilterCAResidents",
+				"FilterCAResidents select(mapColumn(",
+				"          each(match(name==\"GIVENNAME\"),",
+				"               \"FIRSTNAME\" = $$),",
+				"          each(match(name==\"SURNAME\"),",
+				"               \"LASTNAME\" = $$),",
+				"          each(match(name==\"BIRTHDAY\"),",
+				"               \"BIRTHDAY\" = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> MapColumns",
+				"MapColumns sort(desc(LASTNAME, true)) ~> SortByLastNameDesc",
+				"ReadUnzippedFile filter((year(BIRTHDAY) == 1963 || year(BIRTHDAY) == 1964 || year(BIRTHDAY) == 1965) && STATECODE == \"CA\") ~> FilterCAResidentsByYear",
+				"ReadUnzippedFile derive(DOMAIN = concat(\"@\",split(toString(byName(\"EMAILADDRESS\")),\"@\")[2])) ~> SplitEmailAddress",
+				"SortByLastNameDesc sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteCAResidents",
+				"FilterCAResidentsByYear sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteCAResidentsByYear",
+				"SplitEmailAddress sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteDomainFile"
+			]
+		}
+	}
+}

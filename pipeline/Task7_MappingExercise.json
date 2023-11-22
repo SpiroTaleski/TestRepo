@@ -1,0 +1,50 @@
+{
+	"name": "Task7_MappingExercise",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_Task07_MN",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"containerName": "marijanikolovska",
+								"fileName": "Task 07.json"
+							},
+							"sink1": {
+								"containerName": "marijanikolovska",
+								"fileName": {
+									"value": "@concat(pipeline().Pipeline, '_', 'MN', '.csv')",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-20T16:02:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,37 @@
+{
+	"name": "Task_5_LM",
+	"properties": {
+		"activities": [
+			{
+				"name": "Task_5_LM",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "task_5_lm",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-22T09:09:54Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,135 @@
+{
+	"name": "pl_Task04_BornOnFriday",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['name']['first']"
+								},
+								"sink": {
+									"name": "first"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']['last']"
+								},
+								"sink": {
+									"name": "last"
+								}
+							},
+							{
+								"source": {
+									"path": "['location']['city']"
+								},
+								"sink": {
+									"name": "city"
+								}
+							},
+							{
+								"source": {
+									"path": "['location']['country']"
+								},
+								"sink": {
+									"name": "country"
+								}
+							},
+							{
+								"source": {
+									"path": "['dob']['date']"
+								},
+								"sink": {
+									"name": "results'][0]['dob_date"
+								}
+							},
+							{
+								"source": {
+									"path": "['dob']['age']"
+								},
+								"sink": {
+									"name": "results'][0]['dob_age"
+								}
+							}
+						],
+						"collectionReference": "$['results']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_Task4_RestResource",
+						"type": "DatasetReference",
+						"parameters": {
+							"URL": {
+								"value": "@pipeline().parameters.URL",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": "Leads.csv",
+							"task": "Task3"
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"URL": {
+				"type": "string",
+				"defaultValue": "https://randomuser.me/api/"
+			},
+			"targetFile": {
+				"type": "string",
+				"defaultValue": "Born_on_Friday.xlsx"
+			}
+		},
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-22T11:29:12Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,23 @@
+{
+	"name": "MN_SubTask1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_MN",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "domain.json",
+				"container": "marijanikolovska"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

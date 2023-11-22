@@ -1,0 +1,27 @@
+{
+	"name": "DelimitedText_UNZIPPED",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LM",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Task1.csv",
+				"container": "ljupchomachkovski"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

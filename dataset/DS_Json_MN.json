@@ -1,0 +1,104 @@
+{
+	"name": "DS_Json_MN",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_MN",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"containerName": {
+				"type": "string"
+			},
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().fileName",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().containerName",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"ID": {
+					"type": "integer"
+				},
+				"BIRTHDAY": {
+					"type": "string"
+				},
+				"CCEXPIRES": {
+					"type": "string"
+				},
+				"CCNUMBER": {
+					"type": "integer"
+				},
+				"CCTYPE": {
+					"type": "string"
+				},
+				"CVV2": {
+					"type": "integer"
+				},
+				"CITY": {
+					"type": "string"
+				},
+				"COUNTRY": {
+					"type": "string"
+				},
+				"EMAILADDRESS": {
+					"type": "string"
+				},
+				"GENDER": {
+					"type": "string"
+				},
+				"GIVENNAME": {
+					"type": "string"
+				},
+				"MIDDLEINITIAL": {
+					"type": "string"
+				},
+				"MOTHERSMAIDEN": {
+					"type": "string"
+				},
+				"SSN": {
+					"type": "string"
+				},
+				"STATECODE": {
+					"type": "string"
+				},
+				"STREETADDRESS": {
+					"type": "string"
+				},
+				"SURNAME": {
+					"type": "string"
+				},
+				"TELEPHONENUMBER": {
+					"type": "string"
+				},
+				"UPS": {
+					"type": "string"
+				},
+				"ZIPCODE": {
+					"type": "integer"
+				},
+				"DOMAIN": {
+					"type": "string"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

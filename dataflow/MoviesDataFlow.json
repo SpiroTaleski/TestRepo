@@ -1,0 +1,90 @@
+{
+	"name": "MoviesDataFlow",
+	"properties": {
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MoviesCSV",
+						"type": "DatasetReference"
+					},
+					"name": "MoviesSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CleanedMoviesTarget",
+						"type": "DatasetReference"
+					},
+					"name": "TargetMovies"
+				}
+			],
+			"transformations": [
+				{
+					"name": "CleanMoviesTitleOrig"
+				},
+				{
+					"name": "MoviesByYear"
+				},
+				{
+					"name": "selectOriginal"
+				},
+				{
+					"name": "join1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          title as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> MoviesSource",
+				"MoviesSource derive(Year = toInteger(trim(right(title,6),'()')),",
+				"          title = toString(left(title, length(title)-7))) ~> CleanMoviesTitleOrig",
+				"CleanMoviesTitleOrig aggregate(groupBy(Year),",
+				"     MoviesByYear = count()) ~> MoviesByYear",
+				"CleanMoviesTitleOrig select(mapColumn(",
+				"          id,",
+				"          title,",
+				"          Year",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectOriginal",
+				"selectOriginal, MoviesByYear join(selectOriginal@Year == MoviesByYear@Year,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     partitionBy('hash', 1),",
+				"     broadcast: 'auto')~> join1",
+				"join1 select(mapColumn(",
+				"          id,",
+				"          title,",
+				"          Year = selectOriginal@Year,",
+				"          Year = MoviesByYear@Year,",
+				"          MoviesByYear",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['MoviesByYear.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> TargetMovies"
+			]
+		}
+	}
+}

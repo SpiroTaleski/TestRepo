@@ -1,0 +1,19 @@
+{
+	"name": "REST_JA",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://management.azure.com/subscriptions/ea79b2c7-c5b2-4b68-804b-42b1f128f2ec/resourceGroups/RG_IWConnect/providers/Microsoft.DataFactory/factories/ADF-IWConnect-R1/queryPipelineRuns?api-version=2018-06-01",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous",
+			"authHeaders": {
+				"Authorization": {
+					"type": "SecureString",
+					"value": "**********"
+				}
+			}
+		}
+	}
+}

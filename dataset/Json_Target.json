@@ -1,0 +1,22 @@
+{
+	"name": "Json_Target",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LM",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "ljupchomachkovski"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

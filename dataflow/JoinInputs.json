@@ -1,0 +1,102 @@
+{
+	"name": "JoinInputs",
+	"properties": {
+		"folder": {
+			"name": "Viktorija Stojanova"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS_csv",
+						"type": "DatasetReference"
+					},
+					"name": "LeadsInput"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS_csv",
+						"type": "DatasetReference"
+					},
+					"name": "CAIncomeInput"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "OutputFile"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Bonus1Join"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Bonus2Join"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Join"
+				},
+				{
+					"name": "FilterCity"
+				},
+				{
+					"name": "SortByZip"
+				},
+				{
+					"name": "AddColumn"
+				},
+				{
+					"name": "FilterMoreThan10KColumn"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> LeadsInput",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CAIncomeInput",
+				"LeadsInput, CAIncomeInput join(toString(byName('Zip')) == toString(byName('Zip')),",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> Join",
+				"Join filter(toString(byName('City')) == 'San Francisco') ~> FilterCity",
+				"FilterCity sort(asc(toString(byName('Zip')), true)) ~> SortByZip",
+				"SortByZip derive({MoreThan10K-Boolean} = toString(byName('MoreThan10K')) > '0.43') ~> AddColumn",
+				"AddColumn filter(toString(byName('MoreThan10K-Boolean')) == 'true') ~> FilterMoreThan10KColumn",
+				"SortByZip sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Task3.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> OutputFile",
+				"AddColumn sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Bonus1Join.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Bonus1Join",
+				"FilterMoreThan10KColumn sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Bonus2Join.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Bonus2Join"
+			]
+		}
+	}
+}

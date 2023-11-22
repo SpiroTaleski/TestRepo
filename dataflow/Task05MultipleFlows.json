@@ -1,0 +1,88 @@
+{
+	"name": "Task05MultipleFlows",
+	"properties": {
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CSVSemicolonDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "TrngFilterEven"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "TrngFilterEvenNew"
+				},
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "TrngIDbelow15"
+				},
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "TrngIDabove15"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddNewColumRowNumber"
+				},
+				{
+					"name": "AddRowNumber"
+				},
+				{
+					"name": "FilterEvenIndexRecords"
+				},
+				{
+					"name": "FIlterIDLessThan15"
+				},
+				{
+					"name": "FIlterIDBiggerThan15"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Employee ID} as short,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> TrngFilterEven",
+				"TrngFilterEven derive(RowNumber = 1) ~> AddNewColumRowNumber",
+				"AddNewColumRowNumber window(asc({Employee ID}, true),",
+				"     RowNumber = rowNumber()) ~> AddRowNumber",
+				"AddRowNumber filter(RowNumber % 2 == 0) ~> FilterEvenIndexRecords",
+				"AddRowNumber filter({Employee ID} < 15) ~> FIlterIDLessThan15",
+				"AddRowNumber filter({Employee ID} > 15) ~> FIlterIDBiggerThan15",
+				"FilterEvenIndexRecords sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> TrngFilterEvenNew",
+				"FIlterIDLessThan15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> TrngIDbelow15",
+				"FIlterIDBiggerThan15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> TrngIDabove15"
+			]
+		}
+	}
+}

@@ -1,0 +1,69 @@
+{
+	"name": "Task_3_ProcessMoreThan10K",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadProcessedFile",
+					"description": "Read Processed File"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "StoreFile",
+					"description": "Store File"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterRecords",
+					"description": "Filtering rows using expressions on columns 'moreThan10K - Bolean'"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     target_file_name as string (\"moreThan10k.csv\")",
+				"}",
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as integer,",
+				"          LessThan10K as double,",
+				"          MoreThan10K as double,",
+				"          MoreThan25K as double,",
+				"          {MoreThan50K } as double,",
+				"          {moreThan10K - Bolean} as boolean",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> ReadProcessedFile",
+				"ReadProcessedFile filter({moreThan10K - Bolean} == true()) ~> FilterRecords",
+				"FilterRecords sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($target_file_name)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> StoreFile"
+			]
+		}
+	}
+}

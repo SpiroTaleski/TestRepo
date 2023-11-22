@@ -1,0 +1,89 @@
+{
+	"name": "Task_1_LM",
+	"properties": {
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText_UNZIPPED",
+						"type": "DatasetReference"
+					},
+					"name": "Unzippedfile"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Target_File_CA_Birthdays",
+						"type": "DatasetReference"
+					},
+					"name": "TargetFileCreation"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Select3NeededColumns"
+				},
+				{
+					"name": "OnlyCAResidents"
+				},
+				{
+					"name": "SortDescendingLastName"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ID as short,",
+				"          BIRTHDAY as date,",
+				"          CCEXPIRES as string,",
+				"          CCNUMBER as long,",
+				"          CCTYPE as string,",
+				"          CVV2 as short,",
+				"          CITY as string,",
+				"          COUNTRY as string,",
+				"          EMAILADDRESS as string,",
+				"          GENDER as string,",
+				"          GIVENNAME as string,",
+				"          MIDDLEINITIAL as string,",
+				"          MOTHERSMAIDEN as string,",
+				"          SSN as string,",
+				"          STATECODE as string,",
+				"          STREETADDRESS as string,",
+				"          SURNAME as string,",
+				"          TELEPHONENUMBER as string,",
+				"          UPS as string,",
+				"          ZIPCODE as integer",
+				"     ),",
+				"     allowSchemaDrift: false,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> Unzippedfile",
+				"OnlyCAResidents select(mapColumn(",
+				"          LAST_NAME = SURNAME,",
+				"          FIRST_NAME = GIVENNAME,",
+				"          BIRTHDAY",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> Select3NeededColumns",
+				"Unzippedfile filter(STATECODE=='CA',",
+				"     partitionBy('hash', 1)) ~> OnlyCAResidents",
+				"Select3NeededColumns sort(desc(LAST_NAME, true)) ~> SortDescendingLastName",
+				"SortDescendingLastName sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['CA_Birthdays.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          LAST_NAME,",
+				"          FIRST_NAME,",
+				"          BIRTHDAY",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> TargetFileCreation"
+			]
+		}
+	}
+}

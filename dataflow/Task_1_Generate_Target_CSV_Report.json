@@ -1,0 +1,72 @@
+{
+	"name": "Task_1_Generate_Target_CSV_Report",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadUnzippedFile",
+					"description": "Read Unzipped File"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "WriteReport",
+					"description": "Write CSV Report"
+				}
+			],
+			"transformations": [
+				{
+					"name": "MapRequiredFields",
+					"description": "Map Required Fields"
+				},
+				{
+					"name": "SortByNameAsc",
+					"description": "Sort By Name Ascending"
+				},
+				{
+					"name": "FliterRecords",
+					"description": "Filter Records by Statecode"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     targetFilename as string (\"test.csv\")",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadUnzippedFile",
+				"FliterRecords select(mapColumn(",
+				"          each(match(name==\"SURNAME\"),",
+				"               \"SURNAME\" = $$),",
+				"          each(match(name==\"GIVENNAME\"),",
+				"               \"GIVENNAME\" = $$),",
+				"          each(match(name==\"BIRTHDAY\"),",
+				"               \"BIRTHDAY\" = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> MapRequiredFields",
+				"MapRequiredFields sort(desc(toString(byName(\"GIVENNAME\")), true)) ~> SortByNameAsc",
+				"ReadUnzippedFile filter(toString(byName(\"STATECODE\")) == \"CA\") ~> FliterRecords",
+				"SortByNameAsc sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($targetFilename)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
+				"     partitionBy('hash', 1)) ~> WriteReport"
+			]
+		}
+	}
+}

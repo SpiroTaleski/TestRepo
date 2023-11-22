@@ -1,0 +1,126 @@
+{
+	"name": "CDC_Loading_SAMPLE",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEachApiRequest",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "MetadataLoadDate",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.items",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "ReqresAPI",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@item().endpoint",
+									"type": "Expression"
+								},
+								"method": "POST",
+								"body": {
+									"value": "@item().payload",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "MetadataLoadDate",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "MetadataLoadDate",
+					"value": {
+						"value": "@formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm:ss')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "MetadataLoadDate_copy1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ForEachApiRequest",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "MetadataLoadDate",
+					"value": {
+						"value": "@formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm:ss')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"testParameter": {
+				"type": "string",
+				"defaultValue": "testValue"
+			},
+			"items": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"endpoint": "https://reqres.in/api/login"
+					},
+					{
+						"endpoint": "https://reqres.in/api/login",
+						"payload": {
+							"email": "eve.holt@reqres.in",
+							"password": "cityslicka"
+						}
+					}
+				]
+			}
+		},
+		"variables": {
+			"MetadataLoadDate": {
+				"type": "String",
+				"defaultValue": "default"
+			}
+		},
+		"folder": {
+			"name": "Jovanche Angelevski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-22T00:20:48Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

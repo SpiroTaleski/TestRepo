@@ -1,0 +1,26 @@
+{
+	"name": "TargetCSV_General_LM",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LM",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "ljupchomachkovski"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

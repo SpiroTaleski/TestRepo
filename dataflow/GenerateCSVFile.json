@@ -1,0 +1,119 @@
+{
+	"name": "GenerateCSVFile",
+	"properties": {
+		"folder": {
+			"name": "Viktorija Stojanova"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Input"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "OutputFile"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Bonus1File"
+				},
+				{
+					"dataset": {
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference"
+					},
+					"name": "Bonus2File"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterResidents"
+				},
+				{
+					"name": "MapData"
+				},
+				{
+					"name": "SortLastName"
+				},
+				{
+					"name": "FilterYear"
+				},
+				{
+					"name": "AddNewDomainField"
+				},
+				{
+					"name": "SortbyLastName"
+				},
+				{
+					"name": "FilterYears"
+				},
+				{
+					"name": "GetColumns"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Input",
+				"Input filter(toString(byName('STATECODE')) == 'CA') ~> FilterResidents",
+				"FilterResidents select(mapColumn(",
+				"          each(match(name=='SURNAME'),",
+				"               'LASTNAME' = $$),",
+				"          each(match(name=='GIVENNAME'),",
+				"               'FIRSTNAME' = $$),",
+				"          each(match(name=='BIRTHDAY'),",
+				"               'BIRTHDAY' = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> MapData",
+				"MapData sort(desc(toString(byName('LASNAME')), true)) ~> SortLastName",
+				"SortLastName filter(year(toDate(byName('BIRTHDAY'))) == 1964 || year(toDate(byName('BIRTHDAY'))) == 1965 || year(toDate(byName('BIRTHDAY'))) == 1963) ~> FilterYear",
+				"FilterResidents derive(Domain = concat('@', split(toString(byName('EMAILADDRESS')), '@')[2])) ~> AddNewDomainField",
+				"AddNewDomainField sort(desc(toString(byName('SURNAME')), true)) ~> SortbyLastName",
+				"SortbyLastName filter(year(toDate(byName('BIRTHDAY'))) == 1964 || year(toDate(byName('BIRTHDAY'))) == 1965 || year(toDate(byName('BIRTHDAY'))) == 1963) ~> FilterYears",
+				"FilterYears select(mapColumn(",
+				"          Domain,",
+				"          each(match(name=='SURNAME'),",
+				"               'LASTNAME' = $$),",
+				"          each(match(name=='GIVENNAME'),",
+				"               'FIRSTNAME' = $$),",
+				"          each(match(name=='BIRTHDAY'),",
+				"               'BIRTHDAY' = $$)",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> GetColumns",
+				"SortLastName sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['CA_Birthdays.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> OutputFile",
+				"FilterYear sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Bonus1.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Bonus1File",
+				"GetColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Bonus2.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Bonus2File"
+			]
+		}
+	}
+}

@@ -1,0 +1,55 @@
+{
+	"name": "MultipleFlows_VS",
+	"properties": {
+		"activities": [
+			{
+				"name": "OneInputMultipleOutputs",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "OneInputMultipleOutputs",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"Input": {
+								"containername": "viktorijastojanova",
+								"filename": "Trng_FilterEven.csv"
+							},
+							"TrngFilterEven": {
+								"containername": "viktorijastojanova",
+								"filename": "TrngFilterEven.csv"
+							},
+							"Below15": {
+								"containername": "viktorijastojanova",
+								"filename": "Trng_IDbelow15.csv"
+							},
+							"Above15": {
+								"containername": "viktorijastojanova",
+								"filename": "Trng_IDabove15.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Viktorija Stojanova"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-16T07:28:20Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

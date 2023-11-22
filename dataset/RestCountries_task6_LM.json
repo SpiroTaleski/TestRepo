@@ -1,0 +1,27 @@
+{
+	"name": "RestCountries_task6_LM",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "task6_Countries_LM",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"countryCode": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().countryCode",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

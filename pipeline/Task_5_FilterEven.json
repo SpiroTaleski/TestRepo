@@ -1,0 +1,95 @@
+{
+	"name": "Task_5_FilterEven",
+	"properties": {
+		"activities": [
+			{
+				"name": "FilterEven",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_5_Trng_FilterEven",
+						"type": "DataFlowReference",
+						"parameters": {
+							"target_filename": "\"Trng_FilterEven_Target.csv\""
+						},
+						"datasetParameters": {
+							"ReadSourceFile": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven..csv"
+							},
+							"StoreEven": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven..csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "GreaterLesserThan15",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "FilterEven",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_5_Trng_Greater_Lesser",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"ReadEvenRecords": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven_Target.csv"
+							},
+							"Below15": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven_Target.csv"
+							},
+							"Above15": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven_Target.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-14T15:59:33Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

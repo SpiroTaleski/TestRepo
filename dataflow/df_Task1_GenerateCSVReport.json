@@ -1,0 +1,75 @@
+{
+	"name": "df_Task1_GenerateCSVReport",
+	"properties": {
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "sort1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     filenameDF as string ('CA_Birthdays.csv')",
+				"}",
+				"source(output(",
+				"          BIRTHDAY as string,",
+				"          GIVENNAME as string,",
+				"          STATECODE as string,",
+				"          SURNAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 filter(STATECODE=='CA') ~> filter1",
+				"select1 sort(desc(SURNAME, true),",
+				"     partitionBy('hash', 1)) ~> sort1",
+				"filter1 select(mapColumn(",
+				"          SURNAME,",
+				"          GIVENNAME,",
+				"          BIRTHDAY",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     partitionFileNames:[($filenameDF)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

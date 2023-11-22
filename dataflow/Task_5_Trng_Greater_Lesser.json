@@ -1,0 +1,66 @@
+{
+	"name": "Task_5_Trng_Greater_Lesser",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadEvenRecords"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "Below15"
+				},
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "Above15"
+				}
+			],
+			"transformations": [
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Employee ID} as short,",
+				"          Name as string,",
+				"          {Department ID} as string,",
+				"          rowId as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadEvenRecords",
+				"ReadEvenRecords split(lesser({Employee ID},15),",
+				"     disjoint: false) ~> split1@(LessThan15, GreaterThan15)",
+				"split1@LessThan15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:'Trng_IDbelow15.csv',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Below15",
+				"split1@GreaterThan15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:'Trng_IDabove15.csv',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Above15"
+			]
+		}
+	}
+}

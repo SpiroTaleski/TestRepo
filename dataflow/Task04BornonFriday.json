@@ -1,0 +1,100 @@
+{
+	"name": "Task04BornonFriday",
+	"properties": {
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "RandomUserService",
+						"type": "DatasetReference"
+					},
+					"name": "RestAPI"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "BornOnFriday"
+				}
+			],
+			"transformations": [
+				{
+					"name": "CleanUpData"
+				},
+				{
+					"name": "AddSomeFields"
+				},
+				{
+					"name": "MapFields"
+				},
+				{
+					"name": "FilterBasedOnAgeAndDayOfWeek"
+				},
+				{
+					"name": "AddColumDayOfWeek"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     fileName as string (\"Born_on_Friday.xlsx\")",
+				"}",
+				"source(output(",
+				"          body as (info as (page as boolean, results as short, seed as string, version as double), results as (cell as string, dob as (age as short, date as string), email as string, gender as string, id as (name as string, value as string), location as (city as string, coordinates as (latitude as double, longitude as double), country as string, postcode as string, state as string, street as (name as string, number as short), timezone as (description as string, offset as string)), login as (md5 as string, password as string, salt as string, sha1 as string, sha256 as string, username as string, uuid as string), name as (first as string, last as string, title as string), nat as string, phone as string, picture as (large as string, medium as string, thumbnail as string), registered as (age as short, date as string))[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     httpMethod: 'GET',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     queryParameters: ['results' -> '100'],",
+				"     paginationRules: ['supportRFC5988' -> 'true'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> RestAPI",
+				"RestAPI foldDown(unroll(body.results, body.results),",
+				"     mapColumn(",
+				"          First = body.results.name.first,",
+				"          Last = body.results.name.last,",
+				"          City = body.results.location.city,",
+				"          Country = body.results.location.country,",
+				"          DOB = body.results.dob.date,",
+				"          Age = body.results.dob.age",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> CleanUpData",
+				"CleanUpData derive({Full Name} = First + \" \" + Last,",
+				"          {Day of week} = \"Friday\",",
+				"          DOB = toDate(byName(\"DOB\"))) ~> AddSomeFields",
+				"AddSomeFields select(mapColumn(",
+				"          {Full Name},",
+				"          City,",
+				"          Country,",
+				"          Date = DOB,",
+				"          Age",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> MapFields",
+				"AddColumDayOfWeek filter(Age >= 40 && {Day of week} == \"Friday\") ~> FilterBasedOnAgeAndDayOfWeek",
+				"MapFields derive({Day of week} = case(dayOfWeek(Date)==0,'Sunday',\r",
+				"dayOfWeek(Date)==1,'Monday',\r",
+				"dayOfWeek(Date)==2,'Tuesday',\r",
+				"dayOfWeek(Date)==3,'Wednesday',\r",
+				"dayOfWeek(Date)==4,'Thursday',\r",
+				"dayOfWeek(Date)==5,'Friday',\r",
+				"dayOfWeek(Date)==6,'Saturday')) ~> AddColumDayOfWeek",
+				"FilterBasedOnAgeAndDayOfWeek sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> BornOnFriday"
+			]
+		}
+	}
+}

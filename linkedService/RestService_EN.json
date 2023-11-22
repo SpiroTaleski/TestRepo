@@ -1,0 +1,19 @@
+{
+	"name": "RestService_EN",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"URL": {
+				"type": "String",
+				"defaultValue": "https://randomuser.me/api/"
+			}
+		},
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "@{linkedService().URL}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

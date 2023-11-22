@@ -1,0 +1,83 @@
+{
+	"name": "DF_Task5_MN",
+	"properties": {
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CSV_MN",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CSV_MN",
+						"type": "DatasetReference"
+					},
+					"name": "EvenRecords"
+				},
+				{
+					"dataset": {
+						"referenceName": "CSV_MN",
+						"type": "DatasetReference"
+					},
+					"name": "EvenRecordsBelow15"
+				},
+				{
+					"dataset": {
+						"referenceName": "CSV_MN",
+						"type": "DatasetReference"
+					},
+					"name": "EvenRecordsAbove15"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddRowNo"
+				},
+				{
+					"name": "DecideEvenOddRow"
+				},
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 keyGenerate(output(index as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> AddRowNo",
+				"AddRowNo derive({Even/Odd} = iif(index%2==0, 'Even', 'Odd')) ~> DecideEvenOddRow",
+				"DecideEvenOddRow split(toString((byName('Even/Odd'))) == 'Even',",
+				"     toString(byName('Even/Odd')) == 'Even' &&  toInteger(byName('Employee ID')) <= 15,",
+				"     toString(byName('Even/Odd')) == 'Even' &&  toInteger(byName('Employee ID')) > 15,",
+				"     disjoint: true,",
+				"     partitionBy('hash', 1)) ~> split1@(EvenRecords, EvenRecordsBelow15, EvenRecordsAbove15)",
+				"split1@EvenRecords sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> EvenRecords",
+				"split1@EvenRecordsBelow15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> EvenRecordsBelow15",
+				"split1@EvenRecordsAbove15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> EvenRecordsAbove15"
+			]
+		}
+	}
+}

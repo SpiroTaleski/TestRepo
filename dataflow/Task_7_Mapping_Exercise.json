@@ -1,0 +1,74 @@
+{
+	"name": "Task_7_Mapping_Exercise",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "json_common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "WriteFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "PrepareColumns"
+				},
+				{
+					"name": "SelectColumns"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     target_filename as string (\"test.csv\")",
+				"}",
+				"source(output(",
+				"          {Full Address} as string,",
+				"          {Full Name} as string,",
+				"          ID as boolean,",
+				"          {Zip Code} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> ReadSource",
+				"ReadSource derive({First Name} = split({Full Name},' ')[1],",
+				"          {Last Name} = split({Full Name},' ')[2],",
+				"          {Street Name} = split({Full Address},';')[1],",
+				"          City = split({Full Address},';')[2],",
+				"          Country = split({Full Address},';')[3]) ~> PrepareColumns",
+				"PrepareColumns select(mapColumn(",
+				"          {Full Address},",
+				"          {Full Name},",
+				"          {First Name},",
+				"          {Last Name},",
+				"          {Street Name},",
+				"          City,",
+				"          Country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectColumns",
+				"SelectColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:(\"target_7\" + \"_\" + $target_filename + \".csv\"),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteFile"
+			]
+		}
+	}
+}

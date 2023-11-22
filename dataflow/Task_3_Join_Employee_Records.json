@@ -1,0 +1,112 @@
+{
+	"name": "Task_3_Join_Employee_Records",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadLeads",
+					"description": "Read Leads"
+				},
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadIncomes",
+					"description": "ReadCAIncomes"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "StoreReport",
+					"description": "StoreReport"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinByZipCode",
+					"description": "Inner Join on ZipCode"
+				},
+				{
+					"name": "FilterByCity",
+					"description": "Filter By City"
+				},
+				{
+					"name": "AddingBoleanFlag",
+					"description": "Adding Bolean Flag checking >10K values"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     target_file_name as string (\"task_3_target_report.csv\")",
+				"}",
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> ReadLeads",
+				"source(output(",
+				"          Zip as string,",
+				"          LessThan10K as double,",
+				"          MoreThan10K as double,",
+				"          MoreThan25K as double,",
+				"          {MoreThan50K } as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadIncomes",
+				"ReadLeads, ReadIncomes join(ReadLeads@Zip == ReadIncomes@Zip,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinByZipCode",
+				"JoinByZipCode filter(City == \"San Francisco\") ~> FilterByCity",
+				"FilterByCity derive({moreThan10K - Bolean} = toFloat(MoreThan10K) > 0.43) ~> AddingBoleanFlag",
+				"AddingBoleanFlag sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($target_file_name)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          First,",
+				"          Last,",
+				"          Phone_h,",
+				"          Phone_m,",
+				"          Phone_w,",
+				"          Address,",
+				"          City,",
+				"          State,",
+				"          Zip = ReadLeads@Zip,",
+				"          LessThan10K,",
+				"          MoreThan10K,",
+				"          MoreThan25K,",
+				"          {MoreThan50K },",
+				"          {moreThan10K - Bolean}",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> StoreReport"
+			]
+		}
+	}
+}

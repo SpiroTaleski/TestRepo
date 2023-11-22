@@ -1,0 +1,65 @@
+{
+	"name": "task_6_lm",
+	"properties": {
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "RestCountries_task6_LM",
+						"type": "DatasetReference"
+					},
+					"name": "task6Countries"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Json_Target",
+						"type": "DatasetReference"
+					},
+					"name": "TargetJSON"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          body as (altSpellings as string[], area as double, capital as string[], capitalInfo as (latlng as double[]), car as (side as string, signs as string[]), cca2 as string, cca3 as string, ccn3 as short, cioc as string, coatOfArms as (png as string, svg as string), continents as string[], currencies as (AUD as (name as string, symbol as string)), demonyms as (eng as (f as string, m as string), fra as (f as string, m as string)), fifa as string, flag as string, flags as (alt as string, png as string, svg as string), gini as ({2014} as double), idd as (root as short, suffixes as boolean[]), independent as boolean, landlocked as boolean, languages as (eng as string), latlng as double[], maps as (googleMaps as string, openStreetMaps as string), name as (common as string, nativeName as (eng as (common as string, official as string)), official as string), population as integer, postalCode as (format as string, regex as string), region as string, startOfWeek as string, status as string, subregion as string, timezones as string[], tld as string[], translations as (ara as (common as string, official as string), bre as (common as string, official as string), ces as (common as string, official as string), cym as (common as string, official as string), deu as (common as string, official as string), est as (common as string, official as string), fin as (common as string, official as string), fra as (common as string, official as string), hrv as (common as string, official as string), hun as (common as string, official as string), ita as (common as string, official as string), jpn as (common as string, official as string), kor as (common as string, official as string), nld as (common as string, official as string), per as (common as string, official as string), pol as (common as string, official as string), por as (common as string, official as string), rus as (common as string, official as string), slk as (common as string, official as string), spa as (common as string, official as string), srp as (common as string, official as string), swe as (common as string, official as string), tur as (common as string, official as string), urd as (common as string, official as string), zho as (common as string, official as string)), unMember as boolean),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     httpMethod: 'GET',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     paginationRules: ['supportRFC5988' -> 'true'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> task6Countries",
+				"task6Countries foldDown(unroll(body.capital),",
+				"     mapColumn(",
+				"          capital = body.capital,",
+				"          region = body.region,",
+				"          subregion = body.subregion,",
+				"          commonName = body.name.common,",
+				"          officialName = body.name.official,",
+				"          languages = body.languages.eng,",
+				"          population = body.population",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Country.json'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> TargetJSON"
+			]
+		}
+	}
+}

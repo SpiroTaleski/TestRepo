@@ -1,0 +1,27 @@
+{
+	"name": "Task01Output_IK",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_IK",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ivica Koteski"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "CA_BirthdaysReport.csv",
+				"container": "ivicakoteski"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

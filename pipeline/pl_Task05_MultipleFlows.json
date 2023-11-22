@@ -1,0 +1,65 @@
+{
+	"name": "pl_Task05_MultipleFlows",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_Task5_MultipleFlows",
+						"type": "DataFlowReference",
+						"parameters": {
+							"Report1": {
+								"value": "'@{pipeline().parameters.Report1}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"filename": {
+				"type": "string",
+				"defaultValue": "Trng_FilterEven.csv"
+			},
+			"Task": {
+				"type": "string",
+				"defaultValue": "Task5"
+			},
+			"Report1": {
+				"type": "string",
+				"defaultValue": "Trng_FilterEvenR1.csv"
+			},
+			"Report2": {
+				"type": "string",
+				"defaultValue": "Trng_IDbelow15.csv"
+			},
+			"Report3": {
+				"type": "string",
+				"defaultValue": "Trng_IDabove15.csv"
+			}
+		},
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-21T09:24:35Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,26 @@
+{
+	"name": "VJ_Task1_output_unzipped",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_VJ",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Verica Janakjeva"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "vericajanakjeva"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

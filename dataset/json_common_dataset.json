@@ -1,0 +1,36 @@
+{
+	"name": "json_common_dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "st_azure_blob_storage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"container": {
+				"type": "string",
+				"defaultValue": "spirotaleski"
+			},
+			"filename": {
+				"type": "string",
+				"defaultValue": "Task 07.json"
+			}
+		},
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().filename",
+					"type": "Expression"
+				},
+				"container": "spirotaleski"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

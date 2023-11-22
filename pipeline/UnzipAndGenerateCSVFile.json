@@ -1,0 +1,130 @@
+{
+	"name": "UnzipAndGenerateCSVFile",
+	"properties": {
+		"activities": [
+			{
+				"name": "UnzipFile",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ZipFile",
+						"type": "DatasetReference",
+						"parameters": {
+							"filename": "Task1.zip"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Dataset_VS",
+						"type": "DatasetReference",
+						"parameters": {
+							"containername": "viktorijastojanova",
+							"filename": "testdata.csv"
+						}
+					}
+				]
+			},
+			{
+				"name": "GenerateCSVFile",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "UnzipFile",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "GenerateCSVFile",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"Input": {
+								"containername": "viktorijastojanova",
+								"filename": "testdata.csv"
+							},
+							"OutputFile": {
+								"containername": "viktorijastojanova",
+								"filename": "CA_Birthdays.csv"
+							},
+							"Bonus1File": {
+								"containername": "viktorijastojanova",
+								"filename": "Bonus1.csv"
+							},
+							"Bonus2File": {
+								"containername": "viktorijastojanova",
+								"filename": "Bonus2.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Viktorija Stojanova"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-15T06:52:17Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

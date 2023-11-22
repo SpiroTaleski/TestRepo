@@ -1,0 +1,25 @@
+{
+	"name": "Excel",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_GA",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Gjorge Argirov/Excel"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Leads",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Task8.xlsx",
+				"container": "gjorgeargirov"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,58 @@
+{
+	"name": "task_5_lm",
+	"properties": {
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "task_5_lm",
+						"type": "DatasetReference"
+					},
+					"name": "sourceCsvTask5"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "TargetCSV_General_LM",
+						"type": "DatasetReference"
+					},
+					"name": "TrngFilterEven"
+				}
+			],
+			"transformations": [
+				{
+					"name": "surrogateKey1"
+				},
+				{
+					"name": "filterEvenIndex"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> sourceCsvTask5",
+				"sourceCsvTask5 keyGenerate(output(Index as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> surrogateKey1",
+				"surrogateKey1 filter(mod(Index,2)==0) ~> filterEvenIndex",
+				"filterEvenIndex sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Trng_FilterEven2.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     outputAssertFailedRows: true,",
+				"     partitionBy('hash', 1)) ~> TrngFilterEven"
+			]
+		}
+	}
+}

@@ -1,0 +1,63 @@
+{
+	"name": "DF_Process10K",
+	"properties": {
+		"folder": {
+			"name": "Borko Golomeov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_WriteFinaleFile_BG",
+						"type": "DatasetReference"
+					},
+					"name": "ReadIncomes"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_IncomesMoreThan10K_BG",
+						"type": "DatasetReference"
+					},
+					"name": "WriteIncomesMoreThan10K"
+				}
+			],
+			"transformations": [
+				{
+					"name": "AddBooleanColumn"
+				},
+				{
+					"name": "FilterIncomesMoreThan10k"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as integer,",
+				"          LessThan10K as double,",
+				"          MoreThan10K as double,",
+				"          MoreThan25K as double,",
+				"          {MoreThan50K } as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadIncomes",
+				"ReadIncomes derive({MoreThan10K-Boolean} = toFloat(MoreThan10K) > 0.43) ~> AddBooleanColumn",
+				"AddBooleanColumn filter({MoreThan10K-Boolean} == true()) ~> FilterIncomesMoreThan10k",
+				"FilterIncomesMoreThan10k sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> WriteIncomesMoreThan10K"
+			]
+		}
+	}
+}

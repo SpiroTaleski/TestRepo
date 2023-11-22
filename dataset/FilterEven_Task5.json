@@ -1,0 +1,40 @@
+{
+	"name": "FilterEven_Task5",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_MN",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Trng_FilterEven.csv",
+				"container": "marijanikolovska"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Employee ID",
+				"type": "String"
+			},
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "Department ID",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

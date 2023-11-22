@@ -1,0 +1,132 @@
+{
+	"name": "Task01_Unzip_And_GenerateCSVReport",
+	"properties": {
+		"activities": [
+			{
+				"name": "Generete the new file",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Unzip file",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task01GenerateCSVReport",
+						"type": "DataFlowReference",
+						"parameters": {
+							"fileName": "\"CA_Birthdays.csv\""
+						},
+						"datasetParameters": {
+							"testdata": {
+								"containerName": "gjorgeargirov",
+								"fileName": "testdata.csv"
+							},
+							"CABirthdays": {
+								"containerName": "gjorgeargirov",
+								"fileName": "CA_Birthdays.csv"
+							},
+							"CABirthdaysBonus2": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Bonus2.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "None",
+					"cacheSinks": {
+						"firstRowOnly": true
+					}
+				}
+			},
+			{
+				"name": "Unzip file",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "CSVZipCompressionType",
+						"type": "DatasetReference",
+						"parameters": {
+							"fileName": "Task1.zip"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference",
+						"parameters": {
+							"containerName": "gjorgeargirov",
+							"fileName": "testdata.csv"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-17T09:11:28Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

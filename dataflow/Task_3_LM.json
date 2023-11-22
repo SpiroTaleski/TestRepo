@@ -1,0 +1,86 @@
+{
+	"name": "Task_3_LM",
+	"properties": {
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Task_3_LM_Leads",
+						"type": "DatasetReference"
+					},
+					"name": "Leads"
+				},
+				{
+					"dataset": {
+						"referenceName": "Task_3_LM_Income",
+						"type": "DatasetReference"
+					},
+					"name": "CAIncomeByZip"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "TargetCSV_General_LM",
+						"type": "DatasetReference"
+					},
+					"name": "Task3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "filterSanFrancisco"
+				},
+				{
+					"name": "sort1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Leads",
+				"source(output(",
+				"          Zip as string,",
+				"          LessThan10K as string,",
+				"          MoreThan10K as string,",
+				"          MoreThan25K as string,",
+				"          {MoreThan50K } as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CAIncomeByZip",
+				"Leads, CAIncomeByZip join(Leads@Zip == CAIncomeByZip@Zip,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1 filter(City=='San Francisco') ~> filterSanFrancisco",
+				"filterSanFrancisco sort(asc(Leads@Zip, true)) ~> sort1",
+				"sort1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Task3.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Task3"
+			]
+		}
+	}
+}

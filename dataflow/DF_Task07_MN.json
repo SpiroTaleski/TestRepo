@@ -1,0 +1,90 @@
+{
+	"name": "DF_Task07_MN",
+	"properties": {
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Json_MN",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CSV_MN",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     fileName as string (\"MN.csv\")",
+				"}",
+				"source(output(",
+				"          ID as integer,",
+				"          BIRTHDAY as string,",
+				"          CCEXPIRES as string,",
+				"          CCNUMBER as integer,",
+				"          CCTYPE as string,",
+				"          CVV2 as integer,",
+				"          CITY as string,",
+				"          COUNTRY as string,",
+				"          EMAILADDRESS as string,",
+				"          GENDER as string,",
+				"          GIVENNAME as string,",
+				"          MIDDLEINITIAL as string,",
+				"          MOTHERSMAIDEN as string,",
+				"          SSN as string,",
+				"          STATECODE as string,",
+				"          STREETADDRESS as string,",
+				"          SURNAME as string,",
+				"          TELEPHONENUMBER as string,",
+				"          UPS as string,",
+				"          ZIPCODE as integer,",
+				"          DOMAIN as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments',",
+				"     partitionBy('hash', 1)) ~> source1",
+				"source1 derive({First Name} = split(toString(byName('Full Name')), ' ')[1],",
+				"          {Last Name} = split(toString(byName('Full Name')), ' ')[2],",
+				"          {Street Name} = split(toString(byName('Full Address')), ';')[1],",
+				"          City = split(toString(byName('Full Address')), ';')[2],",
+				"          Country = split(toString(byName('Full Address')), ';')[3]) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          {First Name},",
+				"          {Last Name},",
+				"          {Street Name},",
+				"          City,",
+				"          Country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

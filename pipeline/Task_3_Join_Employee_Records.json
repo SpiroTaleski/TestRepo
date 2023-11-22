@@ -1,0 +1,100 @@
+{
+	"name": "Task_3_Join_Employee_Records",
+	"properties": {
+		"activities": [
+			{
+				"name": "JoinEmployeeRecords",
+				"description": "Join Employee Records",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_3_Join_Employee_Records",
+						"type": "DataFlowReference",
+						"parameters": {
+							"target_file_name": "\"task_3_target.csv\""
+						},
+						"datasetParameters": {
+							"ReadLeads": {
+								"container": "spirotaleski",
+								"file": "Leads.csv"
+							},
+							"ReadIncomes": {
+								"container": "spirotaleski",
+								"file": "CAIncomeByZip.csv"
+							},
+							"StoreReport": {
+								"container": "spirotaleski",
+								"file": "target123.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "ProcessMoreThan10kRecords",
+				"description": "Process More Than 10k Records",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "JoinEmployeeRecords",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_3_ProcessMoreThan10K",
+						"type": "DataFlowReference",
+						"parameters": {
+							"target_file_name": "\"moreThan10k.csv\""
+						},
+						"datasetParameters": {
+							"ReadProcessedFile": {
+								"container": "spirotaleski",
+								"file": "task_3_target.csv"
+							},
+							"StoreFile": {
+								"container": "spirotaleski",
+								"file": "task_3_target.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-14T16:00:15Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

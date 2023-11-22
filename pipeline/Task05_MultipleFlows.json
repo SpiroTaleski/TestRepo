@@ -1,0 +1,55 @@
+{
+	"name": "Task05_MultipleFlows",
+	"properties": {
+		"activities": [
+			{
+				"name": "Task05MultipleFlows",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task05MultipleFlows",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"TrngFilterEven": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Trng_FilterEven.csv"
+							},
+							"TrngFilterEvenNew": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Trng_FilterEvenNew.csv"
+							},
+							"TrngIDbelow15": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Trng_IDbelow15.csv"
+							},
+							"TrngIDabove15": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Trng_IDabove15.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-17T09:11:28Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

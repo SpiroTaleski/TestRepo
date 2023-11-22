@@ -1,0 +1,131 @@
+{
+	"name": "Task_1_Unzip_And_Process_CSV_File",
+	"properties": {
+		"activities": [
+			{
+				"name": "File Unzipping",
+				"description": "Unzip Task 1 File",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "task1_zipped",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "spirotaleski",
+							"file": "Task1.zip"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "common_dataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "spirotaleski",
+							"file": "task_1_unzipped.csv"
+						}
+					}
+				]
+			},
+			{
+				"name": "GenerateTargetCSVReport",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "File Unzipping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_1_Generate_Target_CSV_Report",
+						"type": "DataFlowReference",
+						"parameters": {
+							"targetFilename": {
+								"value": "\"task_1_final_report.csv\"",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"ReadUnzippedFile": {
+								"container": "spirotaleski",
+								"file": "task_1_unzipped.csv"
+							},
+							"WriteReport": {
+								"container": "spirotaleski",
+								"file": "task_1_final_report.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-14T16:00:15Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

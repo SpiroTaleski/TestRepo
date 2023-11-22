@@ -1,0 +1,96 @@
+{
+	"name": "Excel_To_JSON",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "TransformExcel",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"containerName": "petarrajchinoski",
+								"fileName": "Prepare mapping (Mapper) b2386e2e-d8c1-49ea-b6f2-60c823785105 (1).xlsx",
+								"sheetName": "Sheet1"
+							},
+							"source2": {
+								"containerName": "petarrajchinoski",
+								"fileName": "Map MessageText (Mapper) 123071f2-5a3f-48f6-8b37-74376174f2e2.xlsx",
+								"sheetName": "Sheet1"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "None",
+					"cacheSinks": {
+						"firstRowOnly": true
+					}
+				}
+			},
+			{
+				"name": "Data flow1_copy1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Data flow1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "TransformJson",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"containerName": "petarrajchinoski",
+								"fileName": "environment_variables_config.json"
+							},
+							"sink1": {
+								"containerName": "petarrajchinoski",
+								"fileName": "target.json"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "None",
+					"cacheSinks": {
+						"firstRowOnly": true
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Petar Rajchinoski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-07T13:29:54Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

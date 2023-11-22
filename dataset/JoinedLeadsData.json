@@ -1,0 +1,40 @@
+{
+	"name": "JoinedLeadsData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_MN",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Task3.csv",
+				"container": "marijanikolovska"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "SURNAME",
+				"type": "String"
+			},
+			{
+				"name": "GIVENNAME",
+				"type": "String"
+			},
+			{
+				"name": "BIRTHDAY",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

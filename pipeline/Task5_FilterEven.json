@@ -1,0 +1,55 @@
+{
+	"name": "Task5_FilterEven",
+	"properties": {
+		"activities": [
+			{
+				"name": "Data flow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_Task5_MN",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"source1": {
+								"containerName": "marijanikolovska",
+								"fileName": "Trng_FilterEven.csv"
+							},
+							"EvenRecords": {
+								"containerName": "marijanikolovska",
+								"fileName": "FilterEven.csv"
+							},
+							"EvenRecordsBelow15": {
+								"containerName": "marijanikolovska",
+								"fileName": "IdBelow15.csv"
+							},
+							"EvenRecordsAbove15": {
+								"containerName": "marijanikolovska",
+								"fileName": "IdAbove15.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-19T22:21:05Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

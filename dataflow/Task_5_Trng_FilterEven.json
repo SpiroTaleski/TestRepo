@@ -1,0 +1,59 @@
+{
+	"name": "Task_5_Trng_FilterEven",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "ReadSourceFile"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "StoreEven"
+				}
+			],
+			"transformations": [
+				{
+					"name": "GenerateRowId"
+				},
+				{
+					"name": "FilterEven"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     target_filename as string (\"Trng_FilterEven.csv\")",
+				"}",
+				"source(output(",
+				"          {Employee ID} as short,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadSourceFile",
+				"ReadSourceFile rank(asc({Employee ID}, true),",
+				"     output(rowId as long)) ~> GenerateRowId",
+				"GenerateRowId filter(rowId % 2 == 0) ~> FilterEven",
+				"FilterEven sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:($target_filename),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> StoreEven"
+			]
+		}
+	}
+}

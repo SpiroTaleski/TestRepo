@@ -1,0 +1,105 @@
+{
+	"name": "MN_Task1_DataFlow",
+	"properties": {
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MN_unzipped_file",
+						"type": "DatasetReference"
+					},
+					"name": "UnzippedData"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "MN_Task1_Output",
+						"type": "DatasetReference"
+					},
+					"name": "MNTask1"
+				},
+				{
+					"dataset": {
+						"referenceName": "MN_SubTask1",
+						"type": "DatasetReference"
+					},
+					"name": "DomainSubTask"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectNeededColumns"
+				},
+				{
+					"name": "FilterStateCode",
+					"description": "Filtering dat"
+				},
+				{
+					"name": "sortBySurnameDesc"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ID as short,",
+				"          BIRTHDAY as date,",
+				"          CCEXPIRES as string,",
+				"          CCNUMBER as long,",
+				"          CCTYPE as string,",
+				"          CVV2 as short,",
+				"          CITY as string,",
+				"          COUNTRY as string,",
+				"          EMAILADDRESS as string,",
+				"          GENDER as string,",
+				"          GIVENNAME as string,",
+				"          MIDDLEINITIAL as string,",
+				"          MOTHERSMAIDEN as string,",
+				"          SSN as string,",
+				"          STATECODE as string,",
+				"          STREETADDRESS as string,",
+				"          SURNAME as string,",
+				"          TELEPHONENUMBER as string,",
+				"          UPS as string,",
+				"          ZIPCODE as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> UnzippedData",
+				"FilterStateCode select(mapColumn(",
+				"          SURNAME,",
+				"          GIVENNAME,",
+				"          BIRTHDAY",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectNeededColumns",
+				"UnzippedData filter(STATECODE==\"CA\") ~> FilterStateCode",
+				"filter1 sort(desc(SURNAME, true),",
+				"     caseInsensitive: true) ~> sortBySurnameDesc",
+				"selectNeededColumns filter(year(BIRTHDAY) == 1963 || year(BIRTHDAY) == 1964 || year(BIRTHDAY) == 1965) ~> filter1",
+				"FilterStateCode derive(DOMAIN = substring(toString(byName('EMAILADDRESS')),locate('@',toString(byName('EMAILADDRESS'))),50)) ~> derivedColumn1",
+				"sortBySurnameDesc sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Birthdays_CA.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> MNTask1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Output_Domain.json'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> DomainSubTask"
+			]
+		}
+	}
+}

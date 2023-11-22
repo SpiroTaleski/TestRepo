@@ -1,0 +1,109 @@
+{
+	"name": "df_Task5_MultipleFlows",
+	"properties": {
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "Source"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "SinkEven"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "SinkBelow15"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_Task1_CSV_Output",
+						"type": "DatasetReference"
+					},
+					"name": "SinkAbove15"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Rank"
+				},
+				{
+					"name": "split2"
+				},
+				{
+					"name": "FilterEven"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     Report1 as string ('Trng_FilterEvenR1.csv'),",
+				"     Report2 as string ('Trng_IDbelow15.csv'),",
+				"     Report3 as string ('Trng_IDabove15.csv')",
+				"}",
+				"source(output(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Source",
+				"Source rank(asc(toInteger({Employee ID}), true),",
+				"     output(Index as long)) ~> Rank",
+				"FilterEven split(true(),",
+				"     toInteger({Employee ID})<15,",
+				"     toInteger({Employee ID})>15,",
+				"     disjoint: true) ~> split2@(EvenIndex, IDbelow15, IDabove15)",
+				"Rank filter(Index%2==0) ~> FilterEven",
+				"split2@EvenIndex sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     partitionFileNames:[($Report1)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkEven",
+				"split2@IDbelow15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     partitionFileNames:[($Report2)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkBelow15",
+				"split2@IDabove15 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          {Employee ID} as string,",
+				"          Name as string,",
+				"          {Department ID} as string",
+				"     ),",
+				"     partitionFileNames:[($Report3)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> SinkAbove15"
+			]
+		}
+	}
+}

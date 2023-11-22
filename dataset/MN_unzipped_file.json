@@ -1,0 +1,108 @@
+{
+	"name": "MN_unzipped_file",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_MN",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "output.csv",
+				"container": "marijanikolovska"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "ID",
+				"type": "String"
+			},
+			{
+				"name": "BIRTHDAY",
+				"type": "String"
+			},
+			{
+				"name": "CCEXPIRES",
+				"type": "String"
+			},
+			{
+				"name": "CCNUMBER",
+				"type": "String"
+			},
+			{
+				"name": "CCTYPE",
+				"type": "String"
+			},
+			{
+				"name": "CVV2",
+				"type": "String"
+			},
+			{
+				"name": "CITY",
+				"type": "String"
+			},
+			{
+				"name": "COUNTRY",
+				"type": "String"
+			},
+			{
+				"name": "EMAILADDRESS",
+				"type": "String"
+			},
+			{
+				"name": "GENDER",
+				"type": "String"
+			},
+			{
+				"name": "GIVENNAME",
+				"type": "String"
+			},
+			{
+				"name": "MIDDLEINITIAL",
+				"type": "String"
+			},
+			{
+				"name": "MOTHERSMAIDEN",
+				"type": "String"
+			},
+			{
+				"name": "SSN",
+				"type": "String"
+			},
+			{
+				"name": "STATECODE",
+				"type": "String"
+			},
+			{
+				"name": "STREETADDRESS",
+				"type": "String"
+			},
+			{
+				"name": "SURNAME",
+				"type": "String"
+			},
+			{
+				"name": "TELEPHONENUMBER",
+				"type": "String"
+			},
+			{
+				"name": "UPS",
+				"type": "String"
+			},
+			{
+				"name": "ZIPCODE",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

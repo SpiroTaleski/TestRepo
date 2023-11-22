@@ -1,0 +1,28 @@
+{
+	"name": "ds_Task4_RestResource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService_EN",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"URL": {
+					"value": "@dataset().URL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"URL": {
+				"type": "string",
+				"defaultValue": "https://randomuser.me/api/"
+			}
+		},
+		"folder": {
+			"name": "Emilija Nedanovska"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

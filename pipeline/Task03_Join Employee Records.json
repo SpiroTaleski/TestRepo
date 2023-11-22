@@ -1,0 +1,96 @@
+{
+	"name": "Task03_Join Employee Records",
+	"properties": {
+		"description": "Based on the two data sources containing sales leads and income information, generate a report associating each sale lead with the income distribution of their zip code. The report needs to contain records only for leads from San Francisco. The end goal of this requirement is for us to determine the income information for each zip code where each lead lives. ",
+		"activities": [
+			{
+				"name": "DF_EmployeeRecoreds_BG",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_EmployeeRecoreds_BG",
+						"type": "DataFlowReference",
+						"parameters": {
+							"cityName": "\"San Francisco\""
+						},
+						"datasetParameters": {
+							"ReadLeads": {
+								"container": "borkogolomeov",
+								"fileName": "Leads.csv"
+							},
+							"ReadCAIncomes": {
+								"container": "borkogolomeov",
+								"fileName": "CAIncomeByZip.csv"
+							},
+							"WriteFinaleFile": {
+								"container": "borkogolomeov",
+								"fileName": "Task3.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			},
+			{
+				"name": "DF_Process10K",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "DF_EmployeeRecoreds_BG",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_Process10K",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"ReadIncomes": {
+								"container": "borkogolomeov",
+								"fileName": "Task3.csv"
+							},
+							"WriteIncomesMoreThan10K": {
+								"container": "borkogolomeov",
+								"fileName": "Incomes10K.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Borko Golomeov"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-14T20:07:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

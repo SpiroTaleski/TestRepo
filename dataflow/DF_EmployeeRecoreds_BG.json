@@ -1,0 +1,89 @@
+{
+	"name": "DF_EmployeeRecoreds_BG",
+	"properties": {
+		"folder": {
+			"name": "Borko Golomeov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_Leads_BG",
+						"type": "DatasetReference"
+					},
+					"name": "ReadLeads"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_CAIncomeByZip_BG",
+						"type": "DatasetReference"
+					},
+					"name": "ReadCAIncomes"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_WriteFinaleFile_BG",
+						"type": "DatasetReference"
+					},
+					"name": "WriteFinaleFile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "FilterSanFranciscoLeads"
+				},
+				{
+					"name": "JoinLeadsByZip"
+				},
+				{
+					"name": "SortByZipAsc"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     cityName as string (\"San Francisco\")",
+				"}",
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadLeads",
+				"source(output(",
+				"          Zip as string,",
+				"          LessThan10K as double,",
+				"          MoreThan10K as double,",
+				"          MoreThan25K as double,",
+				"          {MoreThan50K } as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> ReadCAIncomes",
+				"ReadLeads filter(toString(byName(\"City\")) == $cityName) ~> FilterSanFranciscoLeads",
+				"FilterSanFranciscoLeads, ReadCAIncomes join(ReadLeads@Zip == ReadCAIncomes@Zip,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> JoinLeadsByZip",
+				"JoinLeadsByZip sort(asc(ReadCAIncomes@Zip, true)) ~> SortByZipAsc",
+				"SortByZipAsc sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Task3.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> WriteFinaleFile"
+			]
+		}
+	}
+}

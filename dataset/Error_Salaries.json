@@ -1,0 +1,24 @@
+{
+	"name": "Error_Salaries",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "KristijanAzureBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Kristijan Celkoski"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Error_Salaries.json",
+				"folderPath": "target",
+				"container": "kristijancelkoski"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,111 @@
+{
+	"name": "Task03JoinEmployeeRecords",
+	"properties": {
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CSVSemicolonDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "Leads"
+				},
+				{
+					"dataset": {
+						"referenceName": "CSVSemicolonDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "CAIncomeByZip"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "Task3"
+				},
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "Bonus2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "JoinBesedOnZipcode"
+				},
+				{
+					"name": "FilterByCity"
+				},
+				{
+					"name": "SortByZipCode"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "FilterOnlyTrueValues"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     fileName as string (\"Task03.csv\"),",
+				"     fileNameBonus as string (\"Task03Bonus2.csv\")",
+				"}",
+				"source(output(",
+				"          First as string,",
+				"          Last as string,",
+				"          Phone_h as string,",
+				"          Phone_m as string,",
+				"          Phone_w as string,",
+				"          Address as string,",
+				"          City as string,",
+				"          State as string,",
+				"          Zip as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Leads",
+				"source(output(",
+				"          Zip as string,",
+				"          LessThan10K as string,",
+				"          MoreThan10K as string,",
+				"          MoreThan25K as string,",
+				"          {MoreThan50K } as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CAIncomeByZip",
+				"Leads, CAIncomeByZip join(Leads@Zip === CAIncomeByZip@Zip,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'off')~> JoinBesedOnZipcode",
+				"JoinBesedOnZipcode filter(City == \"San Francisco\") ~> FilterByCity",
+				"derivedColumn1 sort(asc(Leads@Zip, true)) ~> SortByZipCode",
+				"FilterByCity derive(MoreThan10KBoolean = MoreThan10K > \"0,43\") ~> derivedColumn1",
+				"SortByZipCode filter(MoreThan10KBoolean) ~> FilterOnlyTrueValues",
+				"SortByZipCode sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Task3",
+				"FilterOnlyTrueValues sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileNameBonus)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> Bonus2"
+			]
+		}
+	}
+}

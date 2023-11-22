@@ -1,0 +1,46 @@
+{
+	"name": "DS_ImportZipFile_BG",
+	"properties": {
+		"description": "Import zip file from container",
+		"linkedServiceName": {
+			"referenceName": "BG_AzureBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"container": {
+				"type": "string",
+				"defaultValue": "borkogolomeov"
+			},
+			"fileName": {
+				"type": "string",
+				"defaultValue": "Task1.zip"
+			}
+		},
+		"folder": {
+			"name": "Borko Golomeov/Task1_DataSets"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().fileName",
+					"type": "Expression"
+				},
+				"container": {
+					"value": "@dataset().container",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "ZipDeflate",
+			"compressionLevel": "Optimal",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

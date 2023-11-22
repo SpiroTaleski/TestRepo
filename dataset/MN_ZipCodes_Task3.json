@@ -1,0 +1,48 @@
+{
+	"name": "MN_ZipCodes_Task3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_MN",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Marija Nikolovska"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "CAIncomeByZIP.csv",
+				"container": "marijanikolovska"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Zip",
+				"type": "String"
+			},
+			{
+				"name": "LessThan10K",
+				"type": "String"
+			},
+			{
+				"name": "MoreThan10K",
+				"type": "String"
+			},
+			{
+				"name": "MoreThan25K",
+				"type": "String"
+			},
+			{
+				"name": "MoreThan50K ",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

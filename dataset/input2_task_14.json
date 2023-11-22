@@ -1,0 +1,48 @@
+{
+	"name": "input2_task_14",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "KristijanAzureBlobStorage",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Kristijan Celkoski"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Task14Input2.json",
+				"folderPath": "source",
+				"container": "kristijancelkoski"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"original": {
+					"type": "object",
+					"properties": {
+						"ID": {
+							"type": "string"
+						},
+						"DateOfEmployment": {
+							"type": "string"
+						},
+						"Name": {
+							"type": "string"
+						},
+						"Position": {
+							"type": "string"
+						}
+					}
+				},
+				"Salary": {
+					"type": "integer"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

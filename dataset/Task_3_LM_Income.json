@@ -1,0 +1,48 @@
+{
+	"name": "Task_3_LM_Income",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_LM",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Ljupcho Machkovski"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "CAIncomeByZip.csv",
+				"container": "ljupchomachkovski"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Zip",
+				"type": "String"
+			},
+			{
+				"name": "LessThan10K",
+				"type": "String"
+			},
+			{
+				"name": "MoreThan10K",
+				"type": "String"
+			},
+			{
+				"name": "MoreThan25K",
+				"type": "String"
+			},
+			{
+				"name": "MoreThan50K ",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

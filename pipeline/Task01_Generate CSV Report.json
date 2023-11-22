@@ -1,0 +1,133 @@
+{
+	"name": "Task01_Generate CSV Report",
+	"properties": {
+		"description": "Based on the zip file (Task1.zip) provided, please create a CSV report (file) named “CA_Birthdays.csv”. The report needs to contain the columns last name, first name, and birthdays. Additionally, the records need to be alphabetized by last name in descending order, but the report needs to be only for residents of California (The city is not relevant in this case).",
+		"activities": [
+			{
+				"name": "Unzip file",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings",
+							"compressionProperties": {
+								"type": "ZipDeflateReadSettings"
+							}
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings",
+							"copyBehavior": "FlattenHierarchy"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_ImportZipFile_BG",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "borkogolomeov",
+							"fileName": "Task1.zip"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_UnzippedFile_BG",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "borkogolomeov",
+							"fileName": "unzipped.csv"
+						}
+					}
+				]
+			},
+			{
+				"name": "DF_GenerateFiles",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Unzip file",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DF_GenerateFiles_BG",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"ReadUnzippedFile": {
+								"container": "borkogolomeov",
+								"fileName": "unzipped.csv"
+							},
+							"WriteCAResidents": {
+								"container": "borkogolomeov",
+								"fileName": "CA_Residents.csv"
+							},
+							"WriteCAResidentsByYear": {
+								"container": "borkogolomeov",
+								"fileName": "CAResidentsByYear.csv"
+							},
+							"WriteDomainFile": {
+								"container": "borkogolomeov",
+								"fileName": "editMail.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Borko Golomeov"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-13T14:20:54Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

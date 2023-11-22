@@ -1,0 +1,46 @@
+{
+	"name": "Task04_BornOnFriday",
+	"properties": {
+		"activities": [
+			{
+				"name": "Born on Friday",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task04BornonFriday",
+						"type": "DataFlowReference",
+						"parameters": {
+							"fileName": "\"Born_on_Friday.csv\""
+						},
+						"datasetParameters": {
+							"BornOnFriday": {
+								"containerName": "gjorgeargirov",
+								"fileName": "Born_on_Friday.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-17T09:11:28Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,73 @@
+{
+	"name": "Task07MappingExercise",
+	"properties": {
+		"folder": {
+			"name": "Gjorge Argirov"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "JSON",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CSVCommaDelimiter",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     fileName as string (\"GA.csv\")",
+				"}",
+				"source(output(",
+				"          {Full Address} as string,",
+				"          {Full Name} as string,",
+				"          ID as boolean,",
+				"          {Zip Code} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> source1",
+				"source1 derive({First Name} = split(toString(byName('Full Name')), \" \")[1],",
+				"          {Last Name} = split(toString(byName('Full Name')), \" \")[2],",
+				"          {Street Name} = split(toString(byName('Full Address')), \";\")[1],",
+				"          City = split(toString(byName('Full Address')), \";\")[2],",
+				"          Country = split(toString(byName('Full Address')), \";\")[3]) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          {Full Name},",
+				"          {First Name},",
+				"          {Last Name},",
+				"          {Street Name},",
+				"          City,",
+				"          Country",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:[($fileName)],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

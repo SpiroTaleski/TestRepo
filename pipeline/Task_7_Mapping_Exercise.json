@@ -1,0 +1,79 @@
+{
+	"name": "Task_7_Mapping_Exercise",
+	"properties": {
+		"activities": [
+			{
+				"name": "SetInitials",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "initials",
+					"value": "st"
+				}
+			},
+			{
+				"name": "Task7",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "SetInitials",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "Task_7_Mapping_Exercise",
+						"type": "DataFlowReference",
+						"parameters": {
+							"target_filename": {
+								"value": "'@{variables('initials')}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"ReadSource": {
+								"container": "spirotaleski",
+								"filename": "Task 07.json"
+							},
+							"WriteFile": {
+								"container": "spirotaleski",
+								"file": "Trng_FilterEven_Target.csv"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"variables": {
+			"initials": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-15T14:01:58Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

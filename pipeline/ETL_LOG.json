@@ -1,0 +1,99 @@
+{
+	"name": "ETL_LOG",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetAccessToken",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://login.microsoftonline.com/@{pipeline().parameters.tenantId}/oauth2/token",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/x-www-form-urlencoded"
+					},
+					"body": {
+						"value": "@concat('grant_type=', encodeUriComponent('client_credentials'), '&client_id=', encodeUriComponent('18755c30-5c12-4715-9b48-1ac647bce828'), '&client_secret=', encodeUriComponent('wpC8Q~zQ4YwUAW3N8EYoGWEoK1XYKfVwsd3dMc6O'), '&resource=', encodeUriComponent('https://management.azure.com/'))",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetPipelineLog",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetAccessToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://management.azure.com/subscriptions/@{pipeline().parameters.subscriptionId}/resourceGroups/@{pipeline().parameters.resourceGroup}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/queryPipelineRuns?api-version=2018-06-01",
+						"type": "Expression"
+					},
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json",
+						"Authorization": {
+							"value": "@concat('Bearer ', activity('GetAccessToken').output.access_token)",
+							"type": "Expression"
+						}
+					},
+					"body": {
+						"value": "{\n  \"lastUpdatedAfter\": \"@{formatDateTime(subtractFromTime(utcNow(), 1, 'Hour'), 'yyyy-MM-ddTHH:mm:ss')}\",\n  \"lastUpdatedBefore\": \"@{formatDateTime(utcNow(), 'yyyy-MM-ddTHH:mm:ss')}\",\n  \"filters\": [\n    {\n      \"operand\": \"PipelineName\",\n      \"operator\": \"Equals\",\n      \"values\": @{pipeline().parameters.pipelineLogs}\n    }\n  ]\n}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"tenantId": {
+				"type": "string",
+				"defaultValue": "93004b47-238e-4ef7-b9f7-8085640be5b8"
+			},
+			"subscriptionId": {
+				"type": "string",
+				"defaultValue": "ea79b2c7-c5b2-4b68-804b-42b1f128f2ec"
+			},
+			"resourceGroup": {
+				"type": "string",
+				"defaultValue": "RG_IWConnect"
+			},
+			"pipelineLogs": {
+				"type": "array",
+				"defaultValue": [
+					"SRHR_Process",
+					"CDC_Loading_SAMPLE"
+				]
+			}
+		},
+		"folder": {
+			"name": "Jovanche Angelevski"
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-11-22T01:03:26Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

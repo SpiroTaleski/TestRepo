@@ -1,0 +1,72 @@
+{
+	"name": "Task_4_Born_On_Friday",
+	"properties": {
+		"folder": {
+			"name": "Spiro Taleski"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "RestResource_st",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "common_dataset",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				},
+				{
+					"name": "filter1"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     target_file as string (\"Born_on_Friday.csv\")",
+				"}",
+				"source(output(",
+				"          body as (info as (page as boolean, results as short, seed as string, version as double), results as (cell as string, dob as (age as short, date as string), email as string, gender as string, id as (name as string, value as string), location as (city as string, coordinates as (latitude as double, longitude as double), country as string, postcode as string, state as string, street as (name as string, number as short), timezone as (description as string, offset as string)), login as (md5 as string, password as string, salt as string, sha1 as string, sha256 as string, username as string, uuid as string), name as (first as string, last as string, title as string), nat as string, phone as string, picture as (large as string, medium as string, thumbnail as string), registered as (age as short, date as string))[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     httpMethod: 'GET',",
+				"     timeout: 30,",
+				"     requestInterval: 0,",
+				"     queryParameters: ['results' -> '100'],",
+				"     paginationRules: ['supportRFC5988' -> 'true'],",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1",
+				"source1 foldDown(unroll(body.results),",
+				"     mapColumn(",
+				"          firstName = body.results.name.first,",
+				"          lastName = body.results.name.last,",
+				"          city = body.results.location.city,",
+				"          country = body.results.location.country,",
+				"          date = body.results.dob.date,",
+				"          age = body.results.dob.age",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 filter(and(greater(age,40), equals(dayOfWeek(toDate(date)),6))) ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:($target_file),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}
