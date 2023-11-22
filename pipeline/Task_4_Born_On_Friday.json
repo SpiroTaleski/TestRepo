@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "Task_4_Born_On_Friday",
+						"referenceName": "Task_4_Born_On_Friday1",
 						"type": "DataFlowReference",
 						"parameters": {
 							"target_file": "\"Born_on_Friday.csv\""
